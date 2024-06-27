@@ -7,7 +7,7 @@ import streamlit as st
 
 def load_vocab(file_path):
     with open(file_path, 'r') as f:
-        lines = f.readline()
+        lines = f.readlines()
     words = sorted(set([line.strip().lower() for line in lines]))
     return words
 
@@ -61,9 +61,7 @@ def main():
     if st.button("Correct"):
 
         # tinh khoang cach:
-        distances = dict()
-        for vocab in vocabs:
-            distances[vocab] = distance(word, vocab)
+        distances = {vocab: distance(word, vocab) for vocab in vocabs}
 
         # sắp xếp lại khoảng cách:
         sorted_distances = dict(
