@@ -2,9 +2,12 @@
 
 # mở và lấy từ vựng từ đường dẫn trên máy:
 
+import streamlit as st
+
+
 def load_vocab(file_path):
     with open(file_path, 'r') as f:
-        lines = f.readline()
+        lines = f.readlines()
     words = sorted(set([line.strip().lower() for line in lines]))
     return words
 
@@ -14,6 +17,8 @@ vocabs = load_vocab(
 
 # tính khoảng cách levenshtein:
 
+# định nghĩa khoảng cách ban đầu
+
 
 def initialize_distances(len1, len2):
     distances = [[0] * (len2 + 1) for _ in range(len1 + 1)]
@@ -22,6 +27,8 @@ def initialize_distances(len1, len2):
     for t2 in range(len2 + 1):
         distances[0][t2] = t2
     return distances
+
+# tinh chi phi giữa 2 khoảng cách khi chỉnh sửa
 
 
 def calculate_cost(token1, token2, t1, t2):
@@ -45,9 +52,29 @@ def distance(token1, token2):
     return distances[-1][-1]
 
 
-# Test case
-token1 = "kitten"
-token2 = "sitting"
-distance = distance(token1, token2)
-print(
-    f"The Levenshtein distance between '{token1}' and '{token2}' is {distance}")
+# sử dụng streamlit
+
+
+def main():
+    st.title("Word correction using Levenshtein Distance")
+    word = st.text_input("Word:")
+    if st.button("Correct"):
+
+        # tinh khoang cach:
+        distances = {vocab: distance(word, vocab) for vocab in vocabs}
+
+        # sắp xếp lại khoảng cách:
+        sorted_distances = dict(
+            sorted(distances.items(), key=lambda item: item[1]))
+        correct_word = list(sorted_distances.keys())[0]
+        st.write("Correct word: ", correct_word)
+
+        col1, col2 = st.columns(2)
+        col1.write("Vocabulary: ")
+        col1.write(vocabs)
+        col2.write("Distance")
+        col2.write(sorted_distances)
+
+
+if __name__ == "__main__":
+    main()
